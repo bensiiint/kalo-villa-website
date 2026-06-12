@@ -186,6 +186,7 @@
     var staggerItems = links.concat([cta, social]).filter(Boolean);
     var isOpen = false;
     var animating = false;
+    var navTl = null;
     var dur = reduceMotion ? 0 : 1;
 
     function openNav() {
@@ -200,8 +201,8 @@
       if (lenis) lenis.stop();
       document.documentElement.classList.add('lenis-stopped');
 
-      var tl = gsap.timeline({ onComplete: function () { animating = false; } });
-      tl.set(overlay, { visibility: 'visible' })
+      navTl = gsap.timeline({ onComplete: function () { animating = false; navTl = null; } });
+      navTl.set(overlay, { visibility: 'visible' })
         .to(overlay, { opacity: 1, duration: 0.4 * dur, ease: 'power2.out' })
         .fromTo(staggerItems,
           { opacity: 0, y: 30 },
@@ -211,6 +212,7 @@
     }
 
     function closeNav() {
+      if (navTl) { navTl.kill(); navTl = null; animating = false; }
       if (animating) return;
       animating = true;
       isOpen = false;
@@ -555,15 +557,19 @@
     var grid = qs('.gallery-grid');
     if (!grid || !motionOK) return;
 
-    gsap.fromTo(qsa('.gallery-tile', grid),
-      { scale: 0.92, opacity: 0 },
+    var tiles = qsa('.gallery-tile', grid);
+    gsap.fromTo(tiles,
+      { y: 30, opacity: 0 },
       {
-        scale: 1,
+        y: 0,
         opacity: 1,
-        duration: 1,
-        stagger: 0.07,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: grid, start: 'top 85%' }
+        duration: 0.7,
+        stagger: 0.06,
+        ease: 'power2.out',
+        scrollTrigger: { trigger: grid, start: 'top 88%', once: true },
+        onComplete: function () {
+          tiles.forEach(function (t) { t.style.willChange = 'auto'; });
+        }
       }
     );
   }
