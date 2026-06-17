@@ -58,16 +58,9 @@
   }
 
   /* ------------------------------------------------------------------------
-     03. Page load fade-in
+     03. Page load — CSS @keyframes pageFadeIn handles the fade
      ------------------------------------------------------------------------ */
-  document.body.style.opacity = '0';
-
   document.addEventListener('DOMContentLoaded', function () {
-    if (motionOK) {
-      gsap.to(document.body, { opacity: 1, duration: 0.5, ease: 'power2.out' });
-    } else {
-      document.body.style.opacity = '1';
-    }
     initAll();
   });
 
@@ -93,10 +86,10 @@
     // text/icon color via .is-scrolled: white over the dark hero, ink once
     // past it. Pages with no hero (booking) start in the ink state.
     var hero = qs('.hero') || qs('.page-hero');
+    var threshold = hero ? hero.offsetHeight - 90 : -1;
 
     function updateNav() {
       var y = lenis ? lenis.scroll : window.scrollY;
-      var threshold = hero ? hero.offsetHeight - 90 : -1;
       header.classList.toggle('is-scrolled', y > threshold);
     }
 
@@ -105,7 +98,10 @@
     } else {
       window.addEventListener('scroll', updateNav, { passive: true });
     }
-    window.addEventListener('resize', updateNav);
+    window.addEventListener('resize', function () {
+      threshold = hero ? hero.offsetHeight - 90 : -1;
+      updateNav();
+    });
     updateNav();
   }
 
